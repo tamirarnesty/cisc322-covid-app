@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <body>
-    <h1>My First Web Page</h1>
+    <h1>Get Your COVID</h1>
     <p>Hello there! Thank you for visiting!</p>
 
 </body>

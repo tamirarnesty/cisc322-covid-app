@@ -8,7 +8,8 @@
 
 
 /* 3. Allow the user to choose a patient (from the list of patients in the database) and show their vaccination status -- ie. the patient's name, ohip number, the date the vaccine was given and the type of vaccine that was given. */
-
+SELECT FirstName, MiddleName, LastName FROM Patient;
+SELECT * FROM Vaccination as v join Patient as p on p.OHIPNumber=v.OHIPNumber where p.OHIPNumber='1234567890AB';
 
 /* 4. Show a listing of all workers that work at a vaccination site (chosen by the user).  Show their name and whether they are a doctor or a nurse. */
 SELECT n.FirstName, n.MiddleName, n.LastName FROM Nurse as n, NurseWorksAt as nw WHERE nw.SiteName='KGH' and nw.NurseID=n.ID;
