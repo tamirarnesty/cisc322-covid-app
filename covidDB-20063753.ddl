@@ -183,6 +183,7 @@ INSERT INTO ShipsTo VALUES
 ('AY3456', 'KGH'),
 ('BC4567', 'KGH'),
 ('GU9012', 'KGH'),
+('JH6789', 'KGH'),
 
 ('XF2345', 'Ajax Health Clinic'),
 ('VE8901', 'Ajax Health Clinic'),

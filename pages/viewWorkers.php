@@ -17,7 +17,7 @@
     ?>
 
     <!-- Present the dropdown -->
-    <form action="workersAtSite.php" method="post">
+    <form action="showWorkers.php" method="post">
         <form>
             <label for="siteName">Choose a Vaccination Site:</label>
             <select name="siteName" id="siteName">
