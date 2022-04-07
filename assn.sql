@@ -5,7 +5,7 @@
 */
 
 /* 2. Allow the user to choose a vaccine type and display all the vaccination sites that have (or will) offer that type of vaccine along with the total number of doses that have shipped to that site. */
-
+SELECT SiteName, sum(DoseCount) as VaccineDoses FROM Vaccine as v join ShipsTo as s on v.LotNumber=s.LotNumber WHERE v.Company='Pfizer' group by s.SiteName order by s.SiteName;
 
 /* 3. Allow the user to choose a patient (from the list of patients in the database) and show their vaccination status -- ie. the patient's name, ohip number, the date the vaccine was given and the type of vaccine that was given. */
 SELECT FirstName, MiddleName, LastName FROM Patient;

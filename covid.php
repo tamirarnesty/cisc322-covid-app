@@ -27,6 +27,7 @@
 
     <!-- 4 buttons to go to pages -->
     <div class="container-fluid">
+        <a href="pages/addPatientVaccine.php" class="btn btn-primary">Add Vaccination</a>
         <a href="pages/viewPatients.php" class="btn btn-primary">View Patients</a>
         <a href="pages/viewWorkers.php" class="btn btn-primary">View Health Care Workers</a>
         <a href="pages/viewVaccines.php" class="btn btn-primary">View Vaccinations by Company</a>
