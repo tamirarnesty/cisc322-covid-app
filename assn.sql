@@ -3,6 +3,7 @@
     - Record the vaccination.
     - List all vaccinations for this patient after you update the vaccination table.
 */
+insert into Patient value ('1234567890KJ', '1955-01-01', 'Alexander', '', 'Hamilton');
 
 /* 2. Allow the user to choose a vaccine type and display all the vaccination sites that have (or will) offer that type of vaccine along with the total number of doses that have shipped to that site. */
 SELECT SiteName, sum(DoseCount) as VaccineDoses FROM Vaccine as v join ShipsTo as s on v.LotNumber=s.LotNumber WHERE v.Company='Pfizer' group by s.SiteName order by s.SiteName;

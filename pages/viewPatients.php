@@ -21,6 +21,8 @@
         <form>
             <label for="OHIPNumber">Choose a Patient:</label>
             <select name="Name" id="Name">
+                <!-- Add initial option with value -- Select Site -- -->
+                <option value="0">--Select Patient--</option>
                 <?php foreach ($data as $row) : ?>
                     <option><?= $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] ?></option>
                 <?php endforeach ?>
@@ -28,7 +30,7 @@
             <input type="submit">
         </form>
 
-    <?php
+        <?php
         include 'connectdb.php';
         $name = explode(" ", $_POST["Name"]);
         if (count($name) == 2) {
@@ -41,7 +43,8 @@
             $lastName = $name[2];
         }
 
-        function getOHIP($connection, $firstName, $middleName, $lastName) {
+        function getOHIP($connection, $firstName, $middleName, $lastName)
+        {
             $query = "SELECT OHIPNumber FROM Patient WHERE FirstName=:firstName AND MiddleName=:middleName AND LastName=:lastName";
             $stmt = $connection->prepare($query);
             $stmt->bindParam(':firstName', $firstName);
@@ -51,7 +54,7 @@
             $data = $stmt->fetchAll();
             return $data[0]["OHIPNumber"];
         }
-    
+
         // Get the OHIP number of the patient
         $OHIP = getOHIP($connection, $firstName, $middleName, $lastName);
 
@@ -73,12 +76,14 @@
                 echo "<table border='1'>";
                 // OHIP, Patient Name, Vaccination Date, Vaccination Time, Company, Lot Number
                 echo "<tr><th>OHIP Number</th><th>Patient Name</th><th>Vaccination Date</th><th>Vaccination Time</th><th>Company</th><th>Lot Number</th></tr>";
-                foreach ($data as $row):
+                foreach ($data as $row) :
                     echo "<tr><td>" . $row["OHIPNumber"] . "</td><td>" . $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] . "</td><td>" . $row["VaccinationDate"] . "</td><td>" . $row["VaccinationTime"] . "</td><td>" . $row["Company"] . "</td><td>" . $row["LotNumber"] . "</td></tr>";
                 endforeach;
             }
         }
-    ?>
+        ?>
 </body>
+
+<?php include('components/footer.html'); ?>
 
 </html>

@@ -8,22 +8,19 @@
 </head>
 
 <body>
-    <h1>View Vaccinations at a Vaccination Site</h1>
+    <h1>View Vaccines at a Vaccination Site</h1>
 
     <!-- Load Name of Companies for the dropdown -->
-    <?php
-    include 'connectdb.php';
-
-    $result = $connection->query("SELECT Name FROM Company");
-    $data = $result->fetchAll();
-    ?>
+    <?php include 'companyNames.php'; ?>
 
     <!-- Present the dropdown -->
     <form action="viewVaccines.php" method="post">
         <form>
             <label for="companyName">Choose a Company:</label>
             <select name="companyName" id="companyName">
-                <?php foreach ($data as $row) : ?>
+                <!-- Add initial option with value -- Select Site -- -->
+                <option value="0">--Select Company--</option>
+                <?php foreach ($companies as $row) : ?>
                     <option><?= $row["Name"] ?></option>
                 <?php endforeach ?>
             </select>
@@ -62,5 +59,7 @@
     }
     ?>
 </body>
+
+<?php include('components/footer.html'); ?>
 
 </html>
