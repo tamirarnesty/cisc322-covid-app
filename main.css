@@ -14,13 +14,41 @@
 
 .form-fields {
   width: 100%;
-  /* align-self: center; */
   /* top, right, left, bottom */
   padding: 20px 20px 12px;
-  margin: 0;
+  margin-bottom: 12px;
   display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
   box-shadow: 1px 1px 4px rgb(116, 116, 116);
+}
+
+.column {
+  float: left;
+  width: 100%;
+  padding: 10px;
+}
+
+.left {
+  width: 20%;
+}
+
+.right {
+  width: 80%;
+}
+
+/* Clear floats after the columns */
+.main-columns:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+img {
+  object-fit: contain;
+}
+
+table.table th {
+  background-color: darkgrey;
 }

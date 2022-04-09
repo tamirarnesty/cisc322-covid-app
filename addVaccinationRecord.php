@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<?php include('../components/header.html'); ?>
+<?php include('header.html'); ?>
 
 <head>
     <!-- Required meta tags -->
@@ -10,8 +10,8 @@
 
     <title>Vaccination Records | Add New</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 
 <body>
@@ -31,7 +31,7 @@
         include 'vaccinesAtSites.php';
         ?>
 
-        <form name="vaccineRecordForm" class="form-horizontal" role="form" action="../pages/addVaccinationRecord.php" method="post">
+        <form name="vaccineRecordForm" class="form-horizontal" role="form" action="addVaccinationRecord.php" method="post">
             <input type="hidden" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
             <div class="form-fields">
                 <!-- Patient OHIP Number, disabled -->
@@ -44,15 +44,15 @@
 
                 <!-- Select Vaccination Site -->
                 <div class="form-group row">
-                    <form action="../pages/addVaccinationRecord.php" method="post">
+                    <form action="addVaccinationRecord.php" method="post">
                         <input type="hidden" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
                         <input type="hidden" name="vaccinationSite" value="<?php echo $_POST["vaccinationSite"]; ?>">
 
                         <label for="vaccinationSite" class="col-sm-2 col-form-label">Vaccination Site</label>
                         <div class="col">
-                            <select class="custom-select" name="vaccinationSite" id="vaccinationSite">
+                            <select required class="custom-select" name="vaccinationSite" id="vaccinationSite">
                                 <!-- Add initial option with value -- Select Lot Number -- -->
-                                <option value="0">--Select Site--</option>
+                                <option value>--Select Site--</option>
                                 <?php foreach ($vaccinationSites as $row) : ?>
                                     <option><?= $row["Name"] ?></option>
                                 <?php endforeach ?>
@@ -76,9 +76,9 @@
                 <div class="form-group row">
                     <label for="vaccineLotNumber" class="col-sm-2 col-form-label">Vaccine Lot Number</label>
                     <div class="col">
-                        <select class="custom-select" name="vaccineLotNumber" id="vaccineLotNumber">
+                        <select required class="custom-select" name="vaccineLotNumber" id="vaccineLotNumber">
                             <!-- Add initial option with value -- Select Lot Number -- -->
-                            <option value="0">--Select Lot Number--</option>
+                            <option value>--Select Lot Number--</option>
                             <?php foreach ($vaccinesAtSites as $row) : ?>
                                 <option><?= $row["LotNumber"] ?></option>
                             <?php endforeach ?>
@@ -132,34 +132,31 @@
         }
 
         // Check if form was submitted
-        if (!isset($_POST["submit-full-form"])) {
-            return;
+        if (isset($_POST["submit-full-form"])) {
+            // Get all form information
+            $OHIPNumber = $_POST['OHIPNumber'];
+            $vaccineLotNumber = $_POST['vaccineLotNumber'];
+            $vaccinationSite = $_POST['vaccinationSite'];
+            $vaccinationDate = $_POST['vaccinationDate'];
+            $vaccinationTime = $_POST['vaccinationTime'];
+
+            // Check if all form information is valid
+
+            // If all fields are set, add new patient to the database
+            $result = addVaccinationRecord($connection, $OHIPNumber, $vaccineLotNumber, $vaccinationSite, $vaccinationDate, $vaccinationTime);
+            if ($result) {
+                $result = "<div class='alert alert-success'>The vaccination record was successfully added!</div><br>";
+            } else {
+                // Else, display error message.
+                $result = '<div class="alert alert-danger">An error occured adding the vaccination record. Please try again.</div>';
+            }
+
+            echo $result;
         }
-
-        // Get all form information
-        $OHIPNumber = $_POST['OHIPNumber'];
-        $vaccineLotNumber = $_POST['vaccineLotNumber'];
-        $vaccinationSite = $_POST['vaccinationSite'];
-        $vaccinationDate = $_POST['vaccinationDate'];
-        $vaccinationTime = $_POST['vaccinationTime'];
-
-        // Check if all form information is valid
-
-        // If all fields are set, add new patient to the database
-        $result = addVaccinationRecord($connection, $OHIPNumber, $vaccineLotNumber, $vaccinationSite, $vaccinationDate, $vaccinationTime);
-        if ($result) {
-            $result = "<div class='alert alert-success'>The vaccination record was successfully added!</div><br>";
-        } else {
-            // Else, display error message.
-            $result = '<div class="alert alert-danger">An error occured adding the vaccination record. Please try again.</div>';
-        }
-
-        echo $result;
         ?>
     </div>
-
 </body>
 
-<?php include('../'); ?>
+<?php include('buttonFooter.html'); ?>
 
 </html>

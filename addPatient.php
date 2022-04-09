@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<?php include('../components/header.html'); ?>
+<?php include('header.html'); ?>
 
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Vaccination Records</title>
+    <title>Add Patient</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="../css/main.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 
 <body>
@@ -20,21 +19,19 @@
         <h1>Add New Patient</h1>
 
         <p>Enter the patient's information below.</p>
-        <form class="form-horizontal" role="form" action="../pages/addPatient.php" method="post">
+        <form class="form-horizontal" role="form" action="addPatient.php" method="post">
             <div class="form-fields">
                 <!-- Name -->
                 <div class="form-group row">
                     <label for="fullName" class="col-sm-2 col-form-label">Full Name</label>
                     <div class="col">
-                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
-                        <?php echo "<p class='text-danger'>$errFirstName</p>"; ?>
+                        <input required type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name">
+                        <input required type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
-                        <?php echo "<p class='text-danger'>$errLastName</p>"; ?>
+                        <input required type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
                     </div>
                 </div>
 
@@ -42,8 +39,7 @@
                 <div class="form-group row">
                     <label for="OHIPNumber" class="col-sm-2 col-form-label">OHIP Number</label>
                     <div class="col">
-                        <input type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" placeholder="OHIP Number">
-                        <?php echo "<p class='text-danger'>$errOHIP</p>"; ?>
+                        <input required type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" placeholder="OHIP Number">
                     </div>
                 </div>
 
@@ -51,8 +47,7 @@
                 <div class="form-group row">
                     <label for="dateOfBirth" class="col-sm-2 col-form-label">Date of Birth</label>
                     <div class="col">
-                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
-                        <?php echo "<p class='text-danger'>$errDOB</p>"; ?>
+                        <input required type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
                     </div>
                 </div>
 
@@ -98,19 +93,13 @@
         $OHIPNumber = $_POST["OHIPNumber"];
         $dateOfBirth = $_POST["dateOfBirth"];
 
-        // Check if each field is set, otherwise display error message
-        if (!isset($firstName)) {
-            $errFirstName = "Please enter a first name.";
-            echo "not set";
-        }
-
         // If all fields are set, add new patient to database.
 
         // If adding succeeds, display success message.
         $result = addPatient($connection, $firstName, $middleName, $lastName, $OHIPNumber, $dateOfBirth);
         if ($result) {
             $result = "<div class='alert alert-success'>The patient was successfully added!</div><br>
-            <div class='container-fluid'><a href='../pages/addVaccinationRecord.php' class='btn btn-primary'>Add Vaccination Record</a></div>";
+            <div class='container-fluid'><a href='addVaccinationRecord.php' class='btn btn-primary'>Add Vaccination Record</a></div>";
         } else {
             // Else, display error message.
             $result = '<div class="alert alert-danger">An error occured creating the new patient. Please try again.</div>';
@@ -120,6 +109,6 @@
     </div>
 </body>
 
-<?php include('components/footer.html'); ?>
+<?php include('buttonFooter.html'); ?>
 
 </html>
