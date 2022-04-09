@@ -2,7 +2,7 @@
 include 'connectdb.php';
 
 try {
-    $result = $connection->query("SELECT * FROM ShipsTo");
+    $result = $connection->query("select distinct LotNumber from ShipsTo");
     $vaccinesAtSites = $result->fetchAll();
 } catch (PDOException $e) {
     echo "Error!: " . $e->getMessage() . "<br/>";
@@ -11,7 +11,7 @@ try {
 
 function getVaccinesAtSites($connection, $SiteName)
 {
-    $query = "select LotNumber FROM ShipsTo WHERE SiteName = :SiteName";
+    $query = "select LotNumber from ShipsTo where SiteName = :SiteName";
     $stmt = $connection->prepare($query);
     $stmt->bindParam(':SiteName', $SiteName);
     $result = $stmt->execute();

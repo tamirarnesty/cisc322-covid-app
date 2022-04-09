@@ -34,24 +34,30 @@
         <div class="container-fluid">
             <br>
             <h3>Patient Actions</h3>
-            <a href="viewPatientVaccines.php" class="btn btn-primary">Add Vaccination</a>
-            <a href="viewPatients.php" class="btn btn-primary">View Patients</a>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href=" viewPatientVaccines.php" class="btn btn-primary">Add Vaccination</a>
+                <a href="viewPatients.php" class="btn btn-primary">View Patients</a>
+            </div>
         </div>
 
         <div class="container-fluid">
             <br>
             <h3>Health Care Worker Actions</h3>
-            <a href="viewWorkers.php" class="btn btn-primary">View Health Care Workers</a>
-            <a href="addWorkers.php" class="btn btn-primary">Add Health Care Workers</a>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="viewWorkers.php" class="btn btn-primary">View Health Care Workers</a>
+                <a href="addWorkers.php" class="btn btn-primary">Add Health Care Workers</a>
+            </div>
         </div>
 
         <div class="container-fluid">
             <br>
             <h3>Vaccination Actions</h3>
-            <a href="viewVaccines.php" class="btn btn-primary">View Vaccinations by Company</a>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="viewVaccines.php" class="btn btn-primary">View Vaccinations by Company</a>
+            </div>
         </div>
 
-    </div>
+        </div>
 </body>
 
 <?php include('footer.html'); ?>

@@ -52,3 +52,19 @@ img {
 table.table th {
   background-color: darkgrey;
 }
+
+legend {
+  font-weight: bold;
+}
+
+label.col-form-label {
+  font-weight: bold;
+}
+
+h4 {
+  margin-top: 12px;
+}
+
+.fixed-bottom {
+  margin-top: 48px;
+}

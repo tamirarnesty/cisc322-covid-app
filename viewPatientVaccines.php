@@ -55,7 +55,7 @@
             $patient = $stmt->fetchAll();
 
             // Check if OHIPNumber exists
-            if (!empty($patient)) {
+            if (empty($patient)) {
                 // Present message to ask if they want to add patient
                 echo "Patient with OHIP number <b>" . $OHIPNumber . "</b> does not exist.<br>";
                 echo "Select the button below to add a patient.<br>";
