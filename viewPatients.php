@@ -16,7 +16,7 @@
 
 <body>
     <div class="main">
-        <h1>View patient vaccination details</h1>
+        <h1>Patient Vaccination Details</h1>
 
         <!-- Load Patient names for the dropdown -->
         <?php
@@ -115,13 +115,12 @@
                 $result = executeStatement($stmt);
                 $data = fetchStatement($stmt);
 
-                echo "<br>";
                 // Check if the query returned any results and if not, display a message
                 if (empty($data)) {
-                    echo "<br>Patient <b>" . $selectedPatient . "</b> has no vaccinations.<br>";
+                    echo "Patient <b>" . $selectedPatient . "</b> has no vaccinations.<br>";
                 } else {
                     // Table for the list of vaccinations
-                    echo "<br><h2>Vaccinations</h2>";
+                    echo "<h2>Vaccinations</h2>";
                     echo "<table class='table'>";
                     // OHIP, Patient Name, Vaccination Date, Vaccination Time, Company, Lot Number
                     echo "<tr><th>OHIP Number</th><th>Patient Name</th><th>Vaccination Date</th><th>Vaccination Time</th><th>Company</th><th>Lot Number</th></tr>";

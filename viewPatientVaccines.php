@@ -16,7 +16,7 @@
 
 <body>
     <div class="main">
-        <h1>Patient's Vaccinations</h1>
+        <h1>Patient Vaccination Records</h1>
 
         <!-- Get patient name if selected -->
         <?php $selectedPatient = $_POST["OHIPNumber"]; ?>

@@ -68,3 +68,18 @@ h4 {
 .fixed-bottom {
   margin-top: 48px;
 }
+
+
+.navbar {
+  /* Gradient from left to right */
+  background: linear-gradient(to right, #0B3866, #95F9C3);
+}
+
+/* Headers: Colours and fonts */
+
+/* Body: font and colours */
+
+/* Button: font and colours */
+input[type=submit]:hover, .btn:hover {
+    background-color: #016594;
+  }

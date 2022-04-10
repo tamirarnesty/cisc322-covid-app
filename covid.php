@@ -19,7 +19,7 @@
         <div class="container-fluid">
             <div class="row align-items-center justify-content-start">
                 <div class="col-md-auto">
-                    <img src="images/globe.gif" width="200" alt="" />
+                    <img src="images/globe.gif" width="200" alt="Rotating globe animation" />
                 </div>
                 <div class="col">
                     <h1>Welcome to Tamir's COVID Database</h1>

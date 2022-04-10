@@ -69,7 +69,7 @@
 
         if ($companyName != "") {
             $data = getVaccines($connection, $companyName);
-            echo "<h3>Vaccines shipped to " . $companyName . ":</h3>";
+            echo "<h3>" . $companyName . " Vaccine Availability:</h3>";
             if (empty($data)) {
                 echo "No vaccines shipped by this company.<br>";
             } else {

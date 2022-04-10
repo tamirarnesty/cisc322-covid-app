@@ -4,7 +4,7 @@ function executeStatement($stmt) {
         return $stmt->execute();
     } catch (PDOException $e) {
         echo "Error!: " . $e->getMessage() . "<br/>";
-        die();
+        // die();
     }
 }
 

@@ -37,7 +37,8 @@
         <!-- Get medical practice if selected -->
         <?php $selectedPractice = $_POST["medicalPractice"]; ?>
 
-        <form class="form-horizontal needs-validation" novalidate role="form" action="addWorkers.php" method="post">
+        <!-- needs-validation novalidate -->
+        <form class="form-horizontal" role="form" action="addWorkers.php" method="post">
             <!-- Select worker type and location -->
             <h4>Worker Type and Location</h4>
             <div class="form-fields">
@@ -92,7 +93,7 @@
                     <div class="form-group row">
                         <label for="medicalPractice" class="col-sm-2 col-form-label">Practice Name</label>
                         <div class="col">
-                            <select required class="custom-select" name="medicalPractice" id="medicalPractice">
+                            <select class="custom-select" name="medicalPractice" id="medicalPractice">
                                 <!-- Add initial option with value -- Select Practice -- -->
                                 <option value>--Select Practice--</option>
                                 <?php
@@ -114,9 +115,10 @@
             <div class="form-fields">
                 <!-- ID -->
                 <div class="form-group row">
-                    <label for="id" class="col-sm-2 col-form-label">ID</label>
+                    <label for="id" class="col-sm-2 col-form-label">ID (eg. X01001)</label>
                     <div class="col-sm-10">
-                        <input required type="text" class="form-control" id="id" name="id" placeholder="ID">
+                        <input required type="text" class="form-control" id="id" name="id" placeholder="ID" aria-describedby="idHelp" maxlength="6">
+                        <div id="credentialsHelp" class="form-text">The ID should be 6 characters long.</div>
                         <div class="invalid-feedback">Missing ID.</div>
                     </div>
                 </div>
@@ -180,16 +182,24 @@
             $credentials = $_POST["credentials"];
             $workerType = $_POST["workerRadios"];
             $vaccinationSite = $_POST["vaccinationSite"];
+            $credentialsTable = "NurseCredentials";
 
             // If any of the fields equal "", display error message
             if ($id == "" || $firstName == "" || $lastName == "" || $credentials == "" || $workerType == "" || $vaccinationSite == "") {
                 echo '<div class="alert alert-danger">Please fill in every field.</div>';
             } else {
                 // Check if doctor was selected
-                if ($workerType == "Doctor") {
-                    $practiceName = $_POST["medicalPractice"];
+                if ($workerType == "doctor") {
+                    $medicalPractice = $_POST["medicalPractice"];
 
                     // Create doctor
+                    $query = "insert into Doctor (ID, FirstName, MiddleName, LastName, MedicalPractice) VALUES (:id, :firstName, :middleName, :lastName, :medicalPractice)";
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':firstName', $firstName);
+                    $stmt->bindParam(':middleName', $middleName);
+                    $stmt->bindParam(':lastName', $lastName);
+                    $stmt->bindParam(':medicalPractice', $medicalPractice);
 
                     // add new doctor to the database
                     $result = executeStatement($stmt);
@@ -202,31 +212,51 @@
                     }
 
                     echo $message;
-
-                    // Set credentials table to DoctorCredentials
-                    $credentialsTable = "DoctorCredentials";
                 }
                 // Else check if nurse was selected
-                else if ($workerType == "Nurse") {
+                else if ($workerType == "nurse") {
                     // Create nurse
+                    $query = "insert into Nurse (ID, FirstName, MiddleName, LastName) VALUES (:id, :firstName, :middleName, :lastName)";
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':firstName', $firstName);
+                    $stmt->bindParam(':middleName', $middleName);
+                    $stmt->bindParam(':lastName', $lastName);
 
                     // add new doctor to the database
                     $result = executeStatement($stmt);
 
                     if ($result) {
-                        $message = "<div class='alert alert-success'>The doctor was successfully added!</div><br>";
+                        $message = "<div class='alert alert-success'>The nurse was successfully added!</div><br>";
                     } else {
                         // Else, display error message.
-                        $message = '<div class="alert alert-danger">An error occured adding the doctor to the database. Please try again.</div>';
+                        $message = '<div class="alert alert-danger">An error occured adding the nurse to the database. Please try again.</div>';
                     }
 
                     echo $message;
-                    // Set credentials table to NurseCredentials
-                    $credentialsTable = "NurseCredentials";
                 }
 
-                // Add credentials to $credentialsTable table 
+                // Add credentials to $credentialsTable table
+                $credentialsArray = explode(",", $credentials);
                 // Iterate over list to add each one as (ID, Credential)
+                foreach ($credentialsArray as $credential) {
+                    if ($workerType == "nurse") {
+                        $query = "insert into NurseCredentials (ID, Credential) VALUES (:id, :credential)";
+                    } else if ($workerType == "doctor") {
+                        $query = "insert into DoctorCredentials (ID, Credential) VALUES (:id, :credential)";
+                    }
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':credential', $credential);
+
+                    // add credential to the database
+                    $result = executeStatement($stmt);
+                    if (!$result) {
+                        // Else, display error message.
+                        $message = '<div class="alert alert-danger">An error occured adding the credentials to the database. Please try again.</div>';
+                        break;
+                    }
+                }
             }
         }
         ?>
