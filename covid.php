@@ -22,7 +22,7 @@
                     <img src="images/globe.gif" width="200" alt="Rotating globe animation" />
                 </div>
                 <div class="col">
-                    <h1>Welcome to Tamir's COVID Database</h1>
+                    <h1>COVID-19 Vaccination Information Database</h1>
                     <p>Select one of the options below to perform different actions that this platform can do.
                         <br>
                         Be sure to have your, or your patient's, OHIP number handy for some of these options.

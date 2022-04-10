@@ -20,25 +20,33 @@
         <!-- Display the Nurses and Doctors (workers) at the selected site -->
         <?php
         include 'connectdb.php';
+        include 'statementUtils.php';
+
         $siteName = $_POST["siteName"];
         echo "<h1>Health Care Workers at " . $siteName . "</h1>";
-        
+
         function getWorkers($query, $connection, $siteName, $type)
         {
-            $stmt = $connection->prepare($query);
-            $stmt->bindParam(':siteName', $siteName);
-            $result = $stmt->execute();
-            $data = $stmt->fetchAll();
+            try {
+                $stmt = $connection->prepare($query);
+                $stmt->bindParam(':siteName', $siteName);
+                $result = executeStatement($stmt);
+                if ($result) {
+                    $data = fetchStatement($stmt);
 
-            // Check if the query returned any results and if not, display a message
-            echo "<h3>" . ucfirst($type) . ":</h3>";
-            if (empty($data)) {
-                echo "No " . $type . " at this site.<br>";
-            } else {
-                echo '<ul class="list-group">';
-                foreach ($data as $row) :
-                    echo "<li class='list-group-item'>" . $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] . "</li>";
-                endforeach;
+                    // Check if the query returned any results and if not, display a message
+                    echo "<h4>" . ucfirst($type) . ":</h4>";
+                    if (empty($data)) {
+                        echo "No " . $type . " at this site.<br>";
+                    } else {
+                        echo '<ul class="list-group">';
+                        foreach ($data as $row) :
+                            echo "<li class='list-group-item'>" . $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] . "</li>";
+                        endforeach;
+                    }
+                }
+            } catch (PDOException $e) {
+                echo '<div class="alert alert-danger">An error occured getting the ' . $type . '. Please try again.</div>';
             }
         }
 

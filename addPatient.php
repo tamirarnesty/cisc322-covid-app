@@ -20,6 +20,7 @@
 
         <p>Enter the patient's information below.</p>
         <form class="form-horizontal" role="form" action="addPatient.php" method="post">
+            <input type="hidden" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
             <div class="form-fields">
                 <!-- Name -->
                 <div class="form-group row">
@@ -28,7 +29,7 @@
                         <input required type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
                     </div>
                     <div class="col">
-                        <input required type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name">
+                        <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name">
                     </div>
                     <div class="col">
                         <input required type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
@@ -39,7 +40,7 @@
                 <div class="form-group row">
                     <label for="OHIPNumber" class="col-sm-2 col-form-label">OHIP Number</label>
                     <div class="col">
-                        <input required type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" placeholder="OHIP Number">
+                        <input required type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
                     </div>
                 </div>
 
@@ -54,12 +55,7 @@
                 <!-- Submit Button -->
                 <div class="form-group row">
                     <div class="col-sm-10">
-                        <button type="submit" name="submit" class="btn btn-primary">Create Patient</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-10 col-sm-offset-2">
-                        <?php echo $result; ?>
+                        <button type="submit" name="submit-full-form" class="btn btn-primary">Create Patient</button>
                     </div>
                 </div>
             </div>
@@ -68,43 +64,47 @@
         <!-- Add new patient to database from form information. -->
         <?php
         include 'connectdb.php';
-
-        function addPatient($connection, $firstName, $middleName, $lastName, $OHIPNumber, $dateOfBirth)
-        {
-            $query = "insert into Patient value (:OHIPNumber, :dateOfBirth, :firstName, :middleName, :lastName)";
-            $stmt = $connection->prepare($query);
-            $stmt->bindParam(':OHIPNumber', $OHIPNumber);
-            $stmt->bindParam(':dateOfBirth', $dateOfBirth);
-            $stmt->bindParam(':firstName', $firstName);
-            $stmt->bindParam(':middleName', $middleName);
-            $stmt->bindParam(':lastName', $lastName);
-            return $stmt->execute();
-        }
+        include 'statementUtils.php';
 
         // Check if form was submitted
-        if (!isset($_POST['submit'])) {
-            return;
+        if (isset($_POST["submit-full-form"])) {
+
+            // Get all form information
+            $firstName = $_POST["firstName"];
+            $middleName = $_POST["middleName"];
+            $lastName = $_POST["lastName"];
+            $OHIPNumber = $_POST["OHIPNumber"];
+            $dateOfBirth = $_POST["dateOfBirth"];
+
+            // If all fields are set, add new patient to database.
+
+            // If adding succeeds, display success message.
+            try {
+                $query = "insert into Patient value (:OHIPNumber, :dateOfBirth, :firstName, :middleName, :lastName)";
+                $stmt = $connection->prepare($query);
+                $stmt->bindParam(':OHIPNumber', $OHIPNumber);
+                $stmt->bindParam(':dateOfBirth', $dateOfBirth);
+                $stmt->bindParam(':firstName', $firstName);
+                $stmt->bindParam(':middleName', $middleName);
+                $stmt->bindParam(':lastName', $lastName);
+                $result = $stmt->execute();
+                if ($result) {
+                    echo
+                    "<div class='alert alert-success'>The patient was successfully added!</div>
+            <div class='container-fluid'><a href='addVaccinationRecord.php?OHIPNumber=$OHIPNumber' class='btn btn-primary'>Add Vaccination Record</a></div>";
+                } else {
+                    '<div class="alert alert-danger">An error occured adding the patient. Please try again.</div>';
+                }
+            } catch (PDOException $e) {
+                if ($e->getCode() == 23000) {
+                    echo
+                    '<div class="alert alert-danger">A patient with OHIP number ' . $OHIPNumber . ' already exists.</div>';
+                } else {
+                    echo
+                    '<div class="alert alert-danger">An error occured adding the patient. Please try again.</div>';
+                }
+            }
         }
-
-        // Get all form information
-        $firstName = $_POST["firstName"];
-        $middleName = $_POST["middleName"];
-        $lastName = $_POST["lastName"];
-        $OHIPNumber = $_POST["OHIPNumber"];
-        $dateOfBirth = $_POST["dateOfBirth"];
-
-        // If all fields are set, add new patient to database.
-
-        // If adding succeeds, display success message.
-        $result = addPatient($connection, $firstName, $middleName, $lastName, $OHIPNumber, $dateOfBirth);
-        if ($result) {
-            $result = "<div class='alert alert-success'>The patient was successfully added!</div><br>
-            <div class='container-fluid'><a href='addVaccinationRecord.php' class='btn btn-primary'>Add Vaccination Record</a></div>";
-        } else {
-            // Else, display error message.
-            $result = '<div class="alert alert-danger">An error occured creating the new patient. Please try again.</div>';
-        }
-        echo $result;
         ?>
     </div>
 </body>

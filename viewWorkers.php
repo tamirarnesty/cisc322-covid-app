@@ -16,7 +16,7 @@
 
 <body>
     <div class="main">
-        <h1>View workers at a Vaccination Site</h1>
+        <h1>Health Care Workers</h1>
 
         <!-- Load VaccinationSite names for the dropdown -->
         <?php include 'vaccinationSites.php'; ?>
@@ -46,7 +46,7 @@
                 <!-- Submit Button -->
                 <div class="form-group row">
                     <div class="col-sm-10">
-                        <button type="submit" name="submit-full-form" class="btn btn-primary">View vaccines</button>
+                        <button type="submit" name="submit-full-form" class="btn btn-primary">View workers</button>
                     </div>
                 </div>
             </div>

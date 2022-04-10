@@ -11,9 +11,13 @@ try {
 
 function getVaccinesAtSites($connection, $SiteName)
 {
+    try {
     $query = "select LotNumber from ShipsTo where SiteName = :SiteName";
     $stmt = $connection->prepare($query);
     $stmt->bindParam(':SiteName', $SiteName);
     $result = $stmt->execute();
     return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        echo '<div class="alert alert-danger">An error occured getting the vaccines at ' . $SiteName . '. Please try again.</div>';
+    }
 }

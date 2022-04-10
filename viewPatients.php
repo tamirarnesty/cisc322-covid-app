@@ -82,25 +82,26 @@
 
             function getOHIP($connection, $firstName, $middleName, $lastName)
             {
-                if ($middleName == "") {
-                    $query = "select OHIPNumber from Patient where FirstName = :firstName and LastName = :lastName";
-                } else {
-                    $query = "select OHIPNumber from Patient where FirstName = :firstName and MiddleName = :middleName and LastName = :lastName";
-                }
-                $stmt = $connection->prepare($query);
-                $stmt->bindParam(':firstName', $firstName);
-                if ($middleName != "") {
-                    $stmt->bindParam(':middleName', $middleName);
-                }
-                $stmt->bindParam(':lastName', $lastName);
-                $result = executeStatement($stmt);
+                try {
+                    if ($middleName == "") {
+                        $query = "select OHIPNumber from Patient where FirstName = :firstName and LastName = :lastName";
+                    } else {
+                        $query = "select OHIPNumber from Patient where FirstName = :firstName and MiddleName = :middleName and LastName = :lastName";
+                    }
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':firstName', $firstName);
+                    if ($middleName != "") {
+                        $stmt->bindParam(':middleName', $middleName);
+                    }
+                    $stmt->bindParam(':lastName', $lastName);
+                    $result = executeStatement($stmt);
 
-                // check if query worked
-                if ($result) {
-                    return fetchStatement($stmt)[0]["OHIPNumber"];
-                } else {
-                    echo "no worky<br>";
-                    return null;
+                    // check if query worked
+                    if ($result) {
+                        return fetchStatement($stmt)[0]["OHIPNumber"];
+                    }
+                } catch (PDOException $e) {
+                    echo '<div class="alert alert-danger">An error occured getting the OHIP number. Please try again.</div>';
                 }
             }
 
@@ -109,25 +110,29 @@
 
             // Get the list of vaccinations for the patient
             if (isset($OHIP)) {
-                $query = "select * from Vaccination as v join Patient as p on p.OHIPNumber=v.OHIPNumber join Vaccine as c on v.LotNumber=c.LotNumber where p.OHIPNumber=:OHIPNumber";
-                $stmt = $connection->prepare($query);
-                $stmt->bindParam(':OHIPNumber', $OHIP);
-                $result = executeStatement($stmt);
-                $data = fetchStatement($stmt);
+                try {
+                    $query = "select * from Vaccination as v join Patient as p on p.OHIPNumber=v.OHIPNumber join Vaccine as c on v.LotNumber=c.LotNumber where p.OHIPNumber=:OHIPNumber";
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':OHIPNumber', $OHIP);
+                    $result = executeStatement($stmt);
+                    $data = fetchStatement($stmt);
 
-                // Check if the query returned any results and if not, display a message
-                if (empty($data)) {
-                    echo "Patient <b>" . $selectedPatient . "</b> has no vaccinations.<br>";
-                } else {
-                    // Table for the list of vaccinations
-                    echo "<h2>Vaccinations</h2>";
-                    echo "<table class='table'>";
-                    // OHIP, Patient Name, Vaccination Date, Vaccination Time, Company, Lot Number
-                    echo "<tr><th>OHIP Number</th><th>Patient Name</th><th>Vaccination Date</th><th>Vaccination Time</th><th>Company</th><th>Lot Number</th></tr>";
-                    foreach ($data as $row) :
-                        echo "<tr><td>" . $row["OHIPNumber"] . "</td><td>" . $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] . "</td><td>" . $row["VaccinationDate"] . "</td><td>" . $row["VaccinationTime"] . "</td><td>" . $row["Company"] . "</td><td>" . $row["LotNumber"] . "</td></tr>";
-                    endforeach;
-                    echo "</table>";
+                    // Check if the query returned any results and if not, display a message
+                    if (empty($data)) {
+                        echo "Patient <b>" . $selectedPatient . "</b> has no vaccinations.<br>";
+                    } else {
+                        // Table for the list of vaccinations
+                        echo "<h2>Vaccinations</h2>";
+                        echo "<table class='table'>";
+                        // OHIP, Patient Name, Vaccination Date, Vaccination Time, Company, Lot Number
+                        echo "<tr><th>OHIP Number</th><th>Patient Name</th><th>Vaccination Date</th><th>Vaccination Time</th><th>Company</th><th>Lot Number</th></tr>";
+                        foreach ($data as $row) :
+                            echo "<tr><td>" . $row["OHIPNumber"] . "</td><td>" . $row["FirstName"] . " " . $row["MiddleName"] . " " . $row["LastName"] . "</td><td>" . $row["VaccinationDate"] . "</td><td>" . $row["VaccinationTime"] . "</td><td>" . $row["Company"] . "</td><td>" . $row["LotNumber"] . "</td></tr>";
+                        endforeach;
+                        echo "</table>";
+                    }
+                } catch (PDOException $e) {
+                    echo '<div class="alert alert-danger">An error occured getting the list of vaccinations for patient with OHIP number ' . $OHIP . '. Please try again.</div>';
                 }
             }
             ?>

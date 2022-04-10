@@ -16,7 +16,7 @@
 
 <body>
     <div class="main">
-        <h1>View Vaccines at a Vaccination Site</h1>
+        <h1>Vaccine Availability</h1>
 
         <!-- Load Name of Companies for the dropdown -->
         <?php include 'companyNames.php'; ?>
@@ -59,12 +59,16 @@
 
         function getVaccines($connection, $companyName)
         {
+            try {
             $query = "select SiteName, sum(DoseCount) as VaccineDoses from Vaccine as v join ShipsTo as s on v.LotNumber=s.LotNumber where v.Company=:companyName group by s.SiteName order by s.SiteName";
             $stmt = $connection->prepare($query);
             $stmt->bindParam(':companyName', $companyName);
             $result = $stmt->execute();
             $data = $stmt->fetchAll();
             return $data;
+            } catch (PDOException $e) {
+                echo '<div class="alert alert-danger">An error occured getting the vaccines from ' . $companyName . '. Please try again.</div>';
+            }
         }
 
         if ($companyName != "") {
@@ -75,7 +79,7 @@
             } else {
                 // Table for the list of vaccines at a site
                 echo "<table class='table'>";
-                echo "<tr><th>Vaccine</th><th>Doses</th></tr>";
+                echo "<tr><th>Vaccination Site</th><th>Doses</th></tr>";
                 foreach ($data as $row) :
                     echo "<tr><td>" . $row["SiteName"] . "</td><td>" . $row["VaccineDoses"] . "</td></tr>";
                 endforeach;

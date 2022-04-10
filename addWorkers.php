@@ -165,7 +165,6 @@
         <!-- Add new worker to the database from the form information. -->
         <?php
         include 'connectdb.php';
-        include 'statementUtils.php';
 
         // Check if form was submitted
         if (isset($_POST["submit-full-form"])) {
@@ -193,69 +192,101 @@
                     $medicalPractice = $_POST["medicalPractice"];
 
                     // Create doctor
-                    $query = "insert into Doctor (ID, FirstName, MiddleName, LastName, MedicalPractice) VALUES (:id, :firstName, :middleName, :lastName, :medicalPractice)";
-                    $stmt = $connection->prepare($query);
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':firstName', $firstName);
-                    $stmt->bindParam(':middleName', $middleName);
-                    $stmt->bindParam(':lastName', $lastName);
-                    $stmt->bindParam(':medicalPractice', $medicalPractice);
-
-                    // add new doctor to the database
-                    $result = executeStatement($stmt);
-
-                    if ($result) {
-                        $message = "<div class='alert alert-success'>The doctor was successfully added!</div><br>";
-                    } else {
-                        // Else, display error message.
-                        $message = '<div class="alert alert-danger">An error occured adding the doctor to the database. Please try again.</div>';
+                    try {
+                        $query = "insert into Doctor (ID, FirstName, MiddleName, LastName, MedicalPractice) VALUES (:id, :firstName, :middleName, :lastName, :medicalPractice)";
+                        $stmt = $connection->prepare($query);
+                        $stmt->bindParam(':id', $id);
+                        $stmt->bindParam(':firstName', $firstName);
+                        $stmt->bindParam(':middleName', $middleName);
+                        $stmt->bindParam(':lastName', $lastName);
+                        $stmt->bindParam(':medicalPractice', $medicalPractice);
+                        // add new doctor to the database
+                        $result = $stmt->execute();
+                        if ($result) {
+                            echo "<div class='alert alert-success'>The doctor was successfully added!</div>";
+                        }
+                    } catch (PDOException $e) {
+                        if ($e->getCode() == 23000) {
+                            $message = "<div class='alert alert-danger'>A doctor with this ID already exists.</div>";
+                        } else {
+                            $message = '<div class="alert alert-danger">An error occured adding the doctor to the database. Please try again.</div>';
+                        }
+                        echo $message;
                     }
-
-                    echo $message;
                 }
                 // Else check if nurse was selected
                 else if ($workerType == "nurse") {
                     // Create nurse
-                    $query = "insert into Nurse (ID, FirstName, MiddleName, LastName) VALUES (:id, :firstName, :middleName, :lastName)";
-                    $stmt = $connection->prepare($query);
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':firstName', $firstName);
-                    $stmt->bindParam(':middleName', $middleName);
-                    $stmt->bindParam(':lastName', $lastName);
+                    try {
+                        $query = "insert into Nurse (ID, FirstName, MiddleName, LastName) VALUES (:id, :firstName, :middleName, :lastName)";
+                        $stmt = $connection->prepare($query);
+                        $stmt->bindParam(':id', $id);
+                        $stmt->bindParam(':firstName', $firstName);
+                        $stmt->bindParam(':middleName', $middleName);
+                        $stmt->bindParam(':lastName', $lastName);
 
-                    // add new doctor to the database
-                    $result = executeStatement($stmt);
-
-                    if ($result) {
-                        $message = "<div class='alert alert-success'>The nurse was successfully added!</div><br>";
-                    } else {
-                        // Else, display error message.
-                        $message = '<div class="alert alert-danger">An error occured adding the nurse to the database. Please try again.</div>';
+                        // add new doctor to the database
+                        $result = $stmt->execute();
+                        if ($result) {
+                            echo "<div class='alert alert-success'>The nurse was successfully added!</div>";
+                        }
+                    } catch (PDOException $e) {
+                        if ($e->getCode() == 23000) {
+                            $message = "<div class='alert alert-danger'>A nurse with this ID already exists.</div>";
+                        } else {
+                            $message = '<div class="alert alert-danger">An error occured adding the nurse to the database. Please try again.</div>';
+                        }
+                        echo $message;
                     }
-
-                    echo $message;
                 }
 
                 // Add credentials to $credentialsTable table
                 $credentialsArray = explode(",", $credentials);
                 // Iterate over list to add each one as (ID, Credential)
                 foreach ($credentialsArray as $credential) {
-                    if ($workerType == "nurse") {
-                        $query = "insert into NurseCredentials (ID, Credential) VALUES (:id, :credential)";
-                    } else if ($workerType == "doctor") {
-                        $query = "insert into DoctorCredentials (ID, Credential) VALUES (:id, :credential)";
-                    }
-                    $stmt = $connection->prepare($query);
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':credential', $credential);
+                    try {
+                        if ($workerType == "nurse") {
+                            $query = "insert into NurseCredentials (ID, Credential) VALUES (:id, :credential)";
+                        } else if ($workerType == "doctor") {
+                            $query = "insert into DoctorCredentials (ID, Credential) VALUES (:id, :credential)";
+                        }
+                        $stmt = $connection->prepare($query);
+                        $stmt->bindParam(':id', $id);
+                        $stmt->bindParam(':credential', $credential);
 
-                    // add credential to the database
-                    $result = executeStatement($stmt);
-                    if (!$result) {
-                        // Else, display error message.
-                        $message = '<div class="alert alert-danger">An error occured adding the credentials to the database. Please try again.</div>';
+                        // add credential to the database
+                        $result = $stmt->execute();
+                    } catch (PDOException $e) {
+                        if ($e->getCode() == 23000) {
+                            $message = "<div class='alert alert-danger'>The credential <b>" . $credential . "</b> already exists for this " . $workerType . ".</div>";
+                        } else {
+                            // Else, display error message.
+                            $message = '<div class="alert alert-danger">An error occured adding the credential ' . $credential . ' to the database. Please try again.</div>';
+                        }
+                        echo $message;
                         break;
                     }
+                }
+
+                // Show full list of worker
+                try {
+                    if ($workerType == "nurse") {
+                        $query = "select * from Nurse";
+                    } else if ($workerType == "doctor") {
+                        $query = "select * from Doctor";
+                    }
+                    $stmt = $connection->prepare($query);
+                    $stmt->execute();
+                    $result = $stmt->fetchAll();
+                    echo "<h4>" . ucfirst($workerType) . "s</h4>";
+                    echo "<table class='table'>";
+                    echo "<tr><th>ID</th><th>First Name</th><th>Middle Name</th><th>Last Name</th></tr>";
+                    foreach ($result as $row) {
+                        echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["FirstName"] . "</td><td>" . $row["MiddleName"] . "</td><td>" . $row["LastName"];
+                    }
+                    echo "</table>";
+                } catch (PDOException $e) {
+                    echo '<div class="alert alert-danger">An error occured displaying the worker list. Please try again.</div>';
                 }
             }
         }

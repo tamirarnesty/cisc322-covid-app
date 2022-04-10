@@ -37,21 +37,28 @@
         <!-- Get lot number if selected -->
         <?php $selectedLotNumber = $_POST["vaccineLotNumber"]; ?>
 
-        <form name="vaccineRecordForm" class="form-horizontal needs-validation" novalidate role="form" action="addVaccinationRecord.php" method="post">
-            <input type="hidden" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
+        <?php
+        if (isset($_GET["OHIPNumber"])) {
+            $OHIPNumber = $_GET["OHIPNumber"];
+        } else {
+            $OHIPNumber = $_POST["OHIPNumber"];
+        } ?>
+
+        <form name="vaccineRecordForm" class="form-horizontal" role="form" action="addVaccinationRecord.php" method="post">
+            <input type="hidden" name="OHIPNumber" value="<?php echo $OHIPNumber; ?>">
             <div class="form-fields">
                 <!-- Patient OHIP Number, disabled -->
                 <div class="form-group row">
                     <label for="patientOHIPNumber" class="col-sm-2 col-form-label">OHIP Number</label>
                     <div class="col">
-                        <input type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>" disabled>
+                        <input type="text" class="form-control" id="OHIPNumber" name="OHIPNumber" value="<?php echo $OHIPNumber; ?>">
                     </div>
                 </div>
 
                 <!-- Select Vaccination Site -->
                 <div class="form-group row">
                     <form action="addVaccinationRecord.php" method="post">
-                        <input type="hidden" name="OHIPNumber" value="<?php echo $_POST["OHIPNumber"]; ?>">
+                        <input type="hidden" name="OHIPNumber" value="<?php echo $OHIPNumber; ?>">
                         <input type="hidden" name="vaccinationSite" value="<?php echo $_POST["vaccinationSite"]; ?>">
 
                         <label for="vaccinationSite" class="col-sm-2 col-form-label">Vaccination Site</label>
@@ -85,7 +92,7 @@
                 <div class="form-group row">
                     <label for="vaccineLotNumber" class="col-sm-2 col-form-label">Vaccine Lot Number</label>
                     <div class="col">
-                        <select required class="custom-select" name="vaccineLotNumber" id="vaccineLotNumber">
+                        <select class="custom-select" name="vaccineLotNumber" id="vaccineLotNumber">
                             <!-- Add initial option with value -- Select Lot Number -- -->
                             <option value>--Select Lot Number--</option>
                             <?php
@@ -129,12 +136,10 @@
         <!-- Add vaccination record to the database from the form information. -->
         <?php
         include 'connectdb.php';
-        include 'statementUtils.php';
 
         // Check if form was submitted
         if (isset($_POST["submit-full-form"])) {
             // Get all form information
-            $OHIPNumber = $_POST['OHIPNumber'];
             $vaccineLotNumber = $_POST['vaccineLotNumber'];
             $vaccinationSite = $_POST['vaccinationSite'];
             $vaccinationDate = $_POST['vaccinationDate'];
@@ -144,41 +149,46 @@
             if ($OHIPNumber == "" || $vaccineLotNumber == "" || $vaccinationSite == "" || $vaccinationDate == "" || $vaccinationTime == "") {
                 echo '<div class="alert alert-danger">Please fill in every field.</div>';
             } else {
-
                 // Check if all form information is valid
-                $query = "insert into Vaccination value (:OHIPNumber, :vaccineLotNumber, :vaccinationSite, :vaccinationDate, :vaccinationTime)";
-                $stmt = $connection->prepare($query);
-                $stmt->bindParam(':OHIPNumber', $OHIPNumber);
-                $stmt->bindParam(':vaccineLotNumber', $vaccineLotNumber);
-                $stmt->bindParam(':vaccinationSite', $vaccinationSite);
-                $stmt->bindParam(':vaccinationDate', $vaccinationDate);
-                $stmt->bindParam(':vaccinationTime', $vaccinationTime);
-                // If all fields are set, add new patient to the database
-                $result = executeStatement($stmt);
-
-                if ($result) {
-                    $message = "<div class='alert alert-success'>The vaccination record was successfully added!</div><br>";
-                } else {
-                    // Else, display error message.
-                    $message = '<div class="alert alert-danger">An error occured adding the vaccination record. Please try again.</div>';
+                try {
+                    $query = "insert into Vaccination value (:OHIPNumber, :vaccineLotNumber, :vaccinationSite, :vaccinationDate, :vaccinationTime)";
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':OHIPNumber', $OHIPNumber);
+                    $stmt->bindParam(':vaccineLotNumber', $vaccineLotNumber);
+                    $stmt->bindParam(':vaccinationSite', $vaccinationSite);
+                    $stmt->bindParam(':vaccinationDate', $vaccinationDate);
+                    $stmt->bindParam(':vaccinationTime', $vaccinationTime);
+                    // If all fields are set, add new patient to the database
+                    $result = $stmt->execute();
+                    if ($result) {
+                        echo "<div class='alert alert-success'>The vaccination record was successfully added!</div><br>";
+                    }
+                } catch (PDOException $e) {
+                    if ($e->getCode() == 23000) {
+                        echo "<div class='alert alert-danger'>The vaccination record already exists!</div><br>";
+                    } else {
+                        echo "<div class='alert alert-danger'>Error adding the vaccination record: " . $e->getMessage() . "</div><br>";
+                    }
                 }
-
-                echo $message;
 
                 // Show all vaccinations in table
                 // Get the patient's vaccination information
-                $query = "select Company, OHIPNumber, VaccinationSite, VaccinationTime, VaccinationDate, v1.LotNumber from Vaccination as v1 join Vaccine as v2 on v1.LotNumber=v2.LotNumber where v1.OHIPNumber = :OHIPNumber";
-                $stmt = $connection->prepare($query);
-                $stmt->bindParam(':OHIPNumber', $OHIPNumber);
-                $result = executeStatement($stmt);
-                $vaccinations = $stmt->fetchAll();
+                try {
+                    $query = "select Company, OHIPNumber, VaccinationSite, VaccinationTime, VaccinationDate, v1.LotNumber from Vaccination as v1 join Vaccine as v2 on v1.LotNumber=v2.LotNumber where v1.OHIPNumber = :OHIPNumber";
+                    $stmt = $connection->prepare($query);
+                    $stmt->bindParam(':OHIPNumber', $OHIPNumber);
+                    $result = $stmt->execute();
+                    $vaccinations = $stmt->fetchAll();
+                } catch (PDOException $e) {
+                    echo '<div class="alert alert-danger">An error occured getting the vaccination information. Please try again.</div>';
+                }
 
                 // Check if patient has any vaccinations
                 if (empty($vaccinations)) {
                     echo "Patient with OHIP number <b>" . $OHIPNumber . "</b> has no vaccinations.<br>";
                 } else {
                     // Display the patient's information and vaccinations as a table
-                    echo "<h2>Vaccinations</h2>";
+                    echo "<h4>Vaccinations</h4>";
                     echo "<table class='table'>";
                     echo "<tr><th>Company</th><th>Vaccination Date</th><th>Vaccination Time</th><th>Vaccination Site</th><th>Vaccine Lot Number</th></tr>";
                     foreach ($vaccinations as $row) {
@@ -189,34 +199,6 @@
             }
         }
         ?>
-
-        <!-- Optional JavaScript -->
-        <script>
-            // Example starter JavaScript for disabling form submissions if there are invalid fields
-            (function() {
-                'use strict'
-
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.querySelectorAll('.needs-validation')
-
-                // Loop over them and prevent submission
-                // If form does not have name submit-full-form, then skip
-                Array.prototype.slice.call(forms)
-                    .forEach(function(form) {
-                        if (form.name != "submit-full-form") {
-                            return
-                        }
-                        form.addEventListener('submit', function(event) {
-                            if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }
-
-                            form.classList.add('was-validated')
-                        }, false)
-                    })
-            })()
-        </script>
     </div>
 </body>
 
